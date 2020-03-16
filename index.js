@@ -47,8 +47,6 @@ app.get("/petition", (req, res) => {
     console.log("made it to the GET petition route");
 
     if (!req.cookies.cookie) {
-        console.log("am i even here");
-
         res.render("petition");
     } else {
         res.redirect("./thanks"); //res.locals - sta god stavis tako bit ce tamo kad god zoves res.render
@@ -67,37 +65,38 @@ app.post("/petition", (req, res) => {
     const signature = req.body.signature;
     db.addSignatures(first, last, signature)
         .then(result => {
-            console.log(result.rows);
-            res.cookie("cookie", true); /////////////shvatiti treba li nesto ici u cookie
-            res.redirect("./thanks");
+            res.cookie("cookie", true);
+            res.redirect("/thanks");
+            // const {rows} = db addSignatures(req.body);
         })
         .catch(error => {
             console.log(error);
-            res.render("petition"); ////////////da li ce ovako renderirati poruku
+            res.render("petition", { error });
         });
+    req.session.sigid = result.rows[0].id; ///adding it to the object req.session
+    console.log("req.session.sigid: ", req.session.sigid);
 
     // redirects to /thanks if there is a cookie
     // do insert of submitted data into database
     // if there is an error, petition.handlebars is rendered with an error message
     // if there is no error sets cookie to remember
     // redirects to thank you page
-    //const {rows} = db signPetition(req.body);
-    //req.session.sigid = rows[0].id; ///adding it to the object req.session
 });
 
 app.get("/thanks", (req, res) => {
-    console.log("in thenks: ", !req.cookies.cookie);
+    // console.log("in thenks: ", !req.cookies.cookie);
 
     //     GET /thanks
     // redirects to /petition if there is no cookie
     // render thanks.handlebars
     if (!req.cookies.cookie) {
-        console.log("her but not here");
-
         res.redirect("./petition");
     }
-    res.render("thanks");
-    //const sigId = req.session.sigid; ///reading the cookie, using the id
+    const sigId = req.session.sigid;
+    console.log("req.session.sigid: ", sigId);
+
+    res.render("thanks", { sign: sigId });
+    ///reading the cookie, using the id
 });
 
 app.get("/signers", (req, res) => {
@@ -109,27 +108,20 @@ app.get("/signers", (req, res) => {
     // }
     db.getSignatures()
         .then(results => {
+            console.log(results.rows);
+            let signatures = [];
+            for (let i = 0; i < results.rows.length; i++) {
+                signatures.push(
+                    results.rows[i].first + " " + results.rows[i].last
+                );
+            }
             res.render("signers", {
-                // console.log(results.rows[0].first)
-                first: results.rows[0].first,
-                last: results.rows[0].last
+                first: signatures
             });
-            //console.log("results.rows: ", results.rows); /////sto zelim uciniti s rezultatima ustvari
         })
         .catch(err => {
-            console.log("err in getSignatures: ", err); /////sto zelim uciniti s error??
+            console.log("err in getSignatures: ", err);
         });
 });
-
-// app.get("/cities", (req, res) => {
-//     console.log("made it into cities route: ");
-//     db.getCities()
-//         .then(results => {
-//             console.log("results.rows: ", results.rows);
-//         })
-//         .catch(err => {
-//             console.log("err in getCities: ", err);
-//         });
-// });
 
 app.listen(port, () => console.log(`petition up and running on ${port}`));
