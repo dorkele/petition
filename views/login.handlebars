@@ -1,0 +1,13 @@
+{{!-- conditionally renders an error message --}}
+<h1>Please log in</h1>
+<form method="POST">
+    {{#if error}} <div>O-ou, something went wrong. We are very sorry, please try again!</div> {{/if}}
+    <p>Email</p>
+    <input type="text" id="email" name="email">
+    <p>Password</p>
+    <input type="text" id="password" name="password">
+    <div><button id="button">Submit</button></div>
+     <input type="hidden" name="_csrf" value="{{csrfToken}}">
+     <a href="register">Not registered?</a>
+    {{!-- add this form field in every form i will have!!!!!! --}}
+</form>

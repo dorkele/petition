@@ -16,11 +16,6 @@ app.use(
     })
 );
 app.use(cookieParser());
-// app.use((req, res, next) => {
-//     res.set("x-frame-options", "DENY");
-//     res.locals.csrfToken = req.csrfToken;
-//     next();
-// });
 
 app.use(
     express.urlencoded({
@@ -28,74 +23,68 @@ app.use(
     })
 );
 
-// app.use(csurf()); //// has to come after urlencoded, body parsing and cookie session must come before this - token is in the req.body
-
-// app.use((req, res, next) => {
-//     console.log("req.cookies: ", req.cookies);
-
-//     //     if(req.cookies.checked) { //// SKUZITI KAKO OVO NAPISATI!!!!!!!!!!!!!!!!!!!!
-//     //         res.redirect("/thanks") ////////// + da li cookiese napisati u middleware?? jer ce signers onda uvijek redirectati
-//     //     } else {
-//     //         res.redirect
-//     //     }
-//     next();
-// });
-
+app.use(csurf()); //// has to come after urlencoded, body parsing and cookie session must come before this - token is in the req.body
+app.use((req, res, next) => {
+    res.set("x-frame-options", "DENY");
+    res.locals.csrfToken = req.csrfToken;
+    next();
+});
 app.use(express.static("public"));
 
 app.get("/petition", (req, res) => {
-    console.log("made it to the GET petition route");
-
-    if (!req.cookies.cookie) {
-        res.render("petition");
-    } else {
-        res.redirect("./thanks"); //res.locals - sta god stavis tako bit ce tamo kad god zoves res.render
-    }
-    // }
     //     GET /petition
-    // redirects to /thanks if there is a cookie - na kraju i res.redirect
+    // redirects to /thanks if there is a cookie
     // always renders petition.handlebars with no error
+    console.log("made it to the GET petition route");
+    if (req.session.sigid) {
+        res.redirect("/thanks");
+    } else {
+        res.render("petition");
+    }
 });
 
 app.post("/petition", (req, res) => {
     console.log("made it to the POST petition route");
-
-    const first = req.body.first;
-    const last = req.body.last;
-    const signature = req.body.signature;
-    db.addSignatures(first, last, signature)
-        .then(result => {
-            res.cookie("cookie", true);
-            res.redirect("/thanks");
-            // const {rows} = db addSignatures(req.body);
-        })
-        .catch(error => {
-            console.log(error);
-            res.render("petition", { error });
-        });
-    req.session.sigid = result.rows[0].id; ///adding it to the object req.session
-    console.log("req.session.sigid: ", req.session.sigid);
-
     // redirects to /thanks if there is a cookie
     // do insert of submitted data into database
     // if there is an error, petition.handlebars is rendered with an error message
     // if there is no error sets cookie to remember
     // redirects to thank you page
+    const first = req.body.first;
+    const last = req.body.last;
+    const signature = req.body.signature;
+    db.addSignatures(first, last, signature)
+        .then(result => {
+            req.session.sigid = result.rows[0].id; ///adding it to the object req.session
+            console.log("req.session.sigid: ", req.session.sigid);
+
+            res.redirect("/thanks");
+        })
+        .catch(error => {
+            console.log(error);
+            res.render("petition", {
+                error
+            });
+        });
 });
 
 app.get("/thanks", (req, res) => {
-    // console.log("in thenks: ", !req.cookies.cookie);
-
     //     GET /thanks
     // redirects to /petition if there is no cookie
     // render thanks.handlebars
-    if (!req.cookies.cookie) {
-        res.redirect("./petition");
-    }
-    const sigId = req.session.sigid;
-    console.log("req.session.sigid: ", sigId);
+    // console.log("req.session.sigid: ", req.session.sigid);
 
-    res.render("thanks", { sign: sigId });
+    db.getSignature(req.session.sigid)
+        .then(results => {
+            // console.log("results.rows[0].id: ", results.rows[0].signature);
+            res.render("thanks", {
+                signature: results.rows[0].signature
+            });
+        })
+        .catch(err => {
+            console.log("err in getSignatures: ", err);
+        });
+
     ///reading the cookie, using the id
 });
 
@@ -103,25 +92,33 @@ app.get("/signers", (req, res) => {
     //     GET /signers
     // redirects to /petition if there is no cookie
     // get the first and last of every signer from the database and pass them to signers.handlebars
-    // if (!req.cookies.checked) {
-    //     res.redirect("/petition");
-    // }
+    if (!req.session.sigid) {
+        res.redirect("/petition");
+    }
     db.getSignatures()
         .then(results => {
-            console.log(results.rows);
-            let signatures = [];
+            // console.log(results.rows);
+            let signers = [];
             for (let i = 0; i < results.rows.length; i++) {
-                signatures.push(
+                signers.push(
                     results.rows[i].first + " " + results.rows[i].last
                 );
             }
             res.render("signers", {
-                first: signatures
+                signers: signers
             });
         })
         .catch(err => {
             console.log("err in getSignatures: ", err);
         });
+});
+
+app.get("/register", (req, res) => {
+    res.render("register");
+});
+
+app.get("/login", (req, res) => {
+    res.render("login");
 });
 
 app.listen(port, () => console.log(`petition up and running on ${port}`));

@@ -1,15 +1,18 @@
 {{!-- conditionally renders an error message --}}
 <h1>Petition to stop signing petitions</h1>
-<div>What needs to be signed? I am glad you asked! Sign this petition and be part of the change!</div>
+<div>What needs to be signed? I am glad you asked! Sign this petition and be part of the change! Please register first.</div>
 <form method="POST">
     {{#if error}} <div>O-ou, something went wrong. We are very sorry, please try again!</div> {{/if}}
     <p>First name</p>
     <input type="text" id="first" name="first">
     <p>Last name</p>
     <input type="text" id="last" name="last">
-    <p>Signature</p>
-    <canvas id="canv" width="300px" height="50px"><input id="canv-input" type="hidden" name="signature"></canvas>
+    <p>Email</p>
+    <input type="text" id="email" name="email">
+    <p>Password</p>
+    <input type="text" id="password" name="password">
     <div><button id="button">Submit</button></div>
      <input type="hidden" name="_csrf" value="{{csrfToken}}">
+     <a href="login">Already registered?</a>
     {{!-- add this form field in every form i will have!!!!!! --}}
 </form>

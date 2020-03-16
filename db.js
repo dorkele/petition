@@ -16,6 +16,14 @@ module.exports.getSignatures = () => {
     // SELECT first and last names of every signer
     const q = `
     SELECT first, last FROM signatures
+    
 `;
     return db.query(q);
+};
+
+module.exports.getSignature = id => {
+    const q = `SELECT signature FROM SIGNATURES
+        WHERE id=$1`;
+    const params = [id];
+    return db.query(q, params);
 };
