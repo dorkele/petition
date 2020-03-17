@@ -20,7 +20,7 @@ module.exports.getSignatures = () => {
 
 module.exports.getSignature = id => {
     const q = `SELECT signature FROM SIGNATURES
-        WHERE id=$1`;
+        WHERE user_id=$1`;
     const params = [id];
     return db.query(q, params);
 };
@@ -33,9 +33,14 @@ module.exports.insertUsers = (first, last, email, password) => {
     return db.query(q, params);
 };
 
-module.exports.getUserInfo = email => {
+module.exports.getPass = email => {
     const q = `SELECT id, password FROM users
     WHERE email=$1`;
     const params = [email];
     return db.query(q, params);
+};
+
+module.exports.getUserInfo = () => {
+    const q = `SELECT first, last FROM users`;
+    return db.query(q);
 };

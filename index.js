@@ -1,7 +1,7 @@
 const express = require("express");
 const app = express();
 const port = 8080;
-const db = require("./utils/db"); //maybe i will need destructuring
+const db = require("./utils/db");
 const hb = require("express-handlebars");
 const cookieParser = require("cookie-parser");
 const csurf = require("csurf");
@@ -75,13 +75,7 @@ app.get("/login", (req, res) => {
 
 app.post("/login", (req, res) => {
     console.log("/POST LOGIN");
-    //     THESE STEPS MIGHT DIFFER FOR DIFFERENT PEOPLE DEPENDING ON YOUR DATAFLOW
-    // do a db query to find out if they've signed
-    // if yes, you want to put their sigId in a cookie & redirect to /thanks
-    // if not, redirect to /petition
-    ////// if they don't match, COMPARE returns a boolean value of false & re-render with an error message
-    // db.getSignature // SELECT from signature to find out if they've signed (post /login)
-    db.getUserInfo(req.body.email)
+    db.getPass(req.body.email)
         .then(result => {
             const hashedPw = result.rows[0].password;
             compare(req.body.password, hashedPw)
@@ -112,7 +106,6 @@ app.post("/login", (req, res) => {
                     res.render("login", {
                         error
                     });
-                    // you would want to render an error msg to the user
                 });
         })
         .catch(error => {
@@ -123,11 +116,12 @@ app.post("/login", (req, res) => {
 
 app.get("/petition", (req, res) => {
     console.log("made it to the GET petition route");
+    console.log("req.session u get petition: ", req.session);
 
     if (req.session.sigid) {
         res.redirect("/thanks");
-        // } else if (!req.session.user) {
-        //     res.redirect("/register");
+    } else if (!req.session.userId) {
+        res.redirect("/register");
     } else {
         res.render("petition");
     }
@@ -135,11 +129,6 @@ app.get("/petition", (req, res) => {
 
 app.post("/petition", (req, res) => {
     console.log("made it to the POST petition route");
-    // alter your route so that you pass userId from the cookie to your query instead of first and last name
-
-    // const first = req.body.first;
-    // const last = req.body.last;
-    // const signature = req.body.signature;
     const userId = req.session.userId;
     console.log("req.session.userId u post petition: ", req.session.userId);
     console.log("req.body u post petition: ", req.session.body);
@@ -147,13 +136,13 @@ app.post("/petition", (req, res) => {
     const signature = req.body.signature;
 
     // do insert of submitted data into database
-    db.addSignatures(signature, userId) /// tu ce ici promjena
-        // INSERT for signatures table needs to be changed to include the user_id (in post /petition)
+    db.addSignatures(signature, userId)
+
         .then(result => {
             // console.log("req.session in addsignatures: ", req.session);
 
             req.session.sigid = result.rows[0].id; ///adding it to the object req.session
-            // console.log("req.session.sigid: ", req.session.sigid);
+
             res.redirect("/thanks");
         })
         .catch(error => {
@@ -172,9 +161,9 @@ app.get("/thanks", (req, res) => {
     const userId = req.session.userId;
     console.log("req.session.userId in get thanks: ", req.session.userId);
 
-    db.getSignatures(userId)
+    db.getSignature(userId)
         .then(results => {
-            //console.log("results.rows[0].id: ", results.rows[0].signature);
+            // console.log(results);
             res.render("thanks", {
                 signature: results.rows[0].signature
             });
@@ -188,9 +177,9 @@ app.get("/signers", (req, res) => {
     if (!req.session.sigid) {
         res.redirect("/petition");
     }
-    db.getSignatures()
+    db.getUserInfo()
         .then(results => {
-            // console.log(results.rows);
+            console.log("result.rows in get signers", results.rows);
             let signers = [];
             for (let i = 0; i < results.rows.length; i++) {
                 signers.push(
