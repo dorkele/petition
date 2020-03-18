@@ -1,5 +1,15 @@
 <div>Here is a list of signers who care about this as much as you do:</div>
-{{#each signers}} 
-<div>{{this}}</div>
-{{/each}}
-{{!-- expects an array of objects with first and last name properties. loops through the array and prints each first and last name --}}
+
+ {{#userInfo}}
+
+<div>
+    <a href="{{url}}">{{signers}}</a>{{age}}<a href="/signers/{{city}}">{{city}}</a>
+</div>
+
+
+ {{/userInfo}} 
+
+
+
+
+

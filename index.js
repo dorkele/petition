@@ -78,9 +78,13 @@ app.post("/profile", (req, res) => {
 
     const age = req.body.age;
     const city = req.body.city;
-    const url = req.body.url;
+    let url = req.body.url;
     const user_id = req.session.userId;
     console.log(age, city, url, user_id);
+
+    if (!url.startsWith("http" || "https")) {
+        url = "http:" + url;
+    }
 
     db.insertProfile(age, city, url, user_id) /////////// trebam li ovdje dodati jos nesto?
         .then(results => {
@@ -182,7 +186,7 @@ app.get("/thanks", (req, res) => {
         res.redirect("/petition");
     }
     const userId = req.session.userId;
-    console.log("req.session.userId in get thanks: ", req.session.userId);
+    // console.log("req.session.userId in get thanks: ", req.session.userId);
 
     db.getSignature(userId)
         .then(results => {
@@ -202,23 +206,48 @@ app.get("/signers", (req, res) => {
     }
     db.getUserInfo()
         .then(results => {
-            console.log("result.rows in get signers", results.rows);
-            // let signers = [];
-            // for (let i = 0; i < results.rows.length; i++) {
-            //     signers.push(
-            //         results.rows[i].first + " " + results.rows[i].last
-            //     );
-            // }
-            // console.log("signers: ", signers);
+            let userInfo = [];
 
-            res.render(
-                "signers"
-                // {
-                //     signers}
-            );
+            for (let i = 0; i < results.rows.length; i++) {
+                userInfo.push({
+                    signers: results.rows[i].first + " " + results.rows[i].last,
+                    age: results.rows[i].age,
+                    city: results.rows[i].city,
+                    url: results.rows[i].url
+                });
+            }
+
+            res.render("signers", {
+                userInfo
+            });
         })
         .catch(err => {
             console.log("err in getUserInfo: ", err);
+        });
+});
+
+app.get("/signers/:city", (req, res) => {
+    let city = req.params.city;
+    console.log("req.params.city: ", req.params.city);
+
+    db.getSignersFromCity(city)
+        .then(results => {
+            let userInfo = []; ////provjeriti mogu li ovaj kod ne ponoviti ovako plain jane
+            for (let i = 0; i < results.rows.length; i++) {
+                userInfo.push({
+                    signers: results.rows[i].first + " " + results.rows[i].last,
+                    age: results.rows[i].age,
+                    url: results.rows[i].url
+                });
+            }
+            res.render("signers_city", {
+                city,
+                userInfo
+            });
+            console.log("results");
+        })
+        .catch(error => {
+            console.log(error);
         });
 });
 

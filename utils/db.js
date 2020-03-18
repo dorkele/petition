@@ -44,9 +44,10 @@ module.exports.getPass = email => {
 };
 
 module.exports.getUserInfo = () => {
-    const q = `SELECT first, last FROM users
-    JOIN signatures WHERE users.id = signatures.user_id
-    JOIN user_profiles WHERE users.id = user_profiles.user_id`;
+    const q = `SELECT * FROM users
+    JOIN signatures ON users.id = signatures.user_id
+    LEFT OUTER JOIN user_profiles ON users.id = user_profiles.user_id;
+    `;
     return db.query(q);
 };
 
@@ -55,5 +56,15 @@ module.exports.insertProfile = (age, city, url, user_id) => {
     VALUES ($1, $2, $3, $4)
     RETURNING *`;
     const params = [age, city, url, user_id];
+    return db.query(q, params);
+};
+
+module.exports.getSignersFromCity = city => {
+    const q = `SELECT * FROM users
+    JOIN signatures ON users.id = signatures.user_id
+    LEFT OUTER JOIN user_profiles ON users.id = user_profiles.user_id
+    WHERE user_profiles.city=$1 
+    `;
+    const params = [city];
     return db.query(q, params);
 };
