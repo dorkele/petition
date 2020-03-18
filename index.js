@@ -69,6 +69,29 @@ app.post("/register", (req, res) => {
         });
 });
 
+app.get("/profile", (req, res) => {
+    res.render("profile");
+});
+
+app.post("/profile", (req, res) => {
+    console.log("made it to the post profile");
+
+    const age = req.body.age;
+    const city = req.body.city;
+    const url = req.body.url;
+    const user_id = req.session.userId;
+    console.log(age, city, url, user_id);
+
+    db.insertProfile(age, city, url, user_id) /////////// trebam li ovdje dodati jos nesto?
+        .then(results => {
+            console.log(results);
+            res.redirect("/thanks");
+        })
+        .catch(error => {
+            console.log(error);
+        });
+});
+
 app.get("/login", (req, res) => {
     res.render("login");
 });
@@ -179,22 +202,26 @@ app.get("/signers", (req, res) => {
     }
     db.getUserInfo()
         .then(results => {
-            // console.log("result.rows in get signers", results.rows);
-            let signers = [];
-            for (let i = 0; i < results.rows.length; i++) {
-                signers.push(
-                    results.rows[i].first + " " + results.rows[i].last
-                );
-            }
-            console.log("signers: ", signers);
+            console.log("result.rows in get signers", results.rows);
+            // let signers = [];
+            // for (let i = 0; i < results.rows.length; i++) {
+            //     signers.push(
+            //         results.rows[i].first + " " + results.rows[i].last
+            //     );
+            // }
+            // console.log("signers: ", signers);
 
-            res.render("signers", {
-                signers
-            });
+            res.render(
+                "signers"
+                // {
+                //     signers}
+            );
         })
         .catch(err => {
-            console.log("err in getSignatures: ", err);
+            console.log("err in getUserInfo: ", err);
         });
 });
 
-app.listen(port, () => console.log(`petition up and running on ${port}`));
+app.listen(process.env.PORT || port, () =>
+    console.log(`petition up and running on ${port}`)
+);
