@@ -179,15 +179,17 @@ app.get("/signers", (req, res) => {
     }
     db.getUserInfo()
         .then(results => {
-            console.log("result.rows in get signers", results.rows);
+            // console.log("result.rows in get signers", results.rows);
             let signers = [];
             for (let i = 0; i < results.rows.length; i++) {
                 signers.push(
                     results.rows[i].first + " " + results.rows[i].last
                 );
             }
+            console.log("signers: ", signers);
+
             res.render("signers", {
-                signers: signers
+                signers
             });
         })
         .catch(err => {
