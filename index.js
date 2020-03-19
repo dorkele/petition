@@ -127,6 +127,28 @@ app.get("/profile/edit", (req, res) => {
         });
 });
 
+app.post("/profile/edit", (req, res) => {
+    console.log("I AM IN POST PROFILE EDIT ROUTE");
+
+    let newPassword = req.body.password;
+    let first = req.body.first;
+    let last = req.body.last;
+    let email = req.body.email;
+    let userId = req.session.userId;
+
+    if (newPassword == "") {
+        db.oldPWProfileUpdate(first, last, email, userId)
+            .then(results => {
+                console.log(results);
+            })
+            .catch(error => {
+                console.log("error in oldPWProfileUpdate: ", error);
+            });
+    } else {
+        console.log("something else");
+    }
+});
+
 app.get("/login", (req, res) => {
     res.render("login");
 });

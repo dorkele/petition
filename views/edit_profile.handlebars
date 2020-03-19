@@ -2,13 +2,13 @@
 <form method="POST">
     {{#if error}} <div>O-ou, something went wrong. We are very sorry, please try again!</div> {{/if}}
     <p>First</p>
-    <input type="text" id="age" name="age" value={{first}}>
+    <input type="text" id="first" name="first" value={{first}}>
     <p>Last</p>
-    <input type="text" id="city" name="city" value={{last}}>
+    <input type="text" id="last" name="last" value={{last}}>
     <p>Email</p>
-    <input type="text" id="url" name="url" value={{email}}>
+    <input type="text" id="email" name="email" value={{email}}>
      <p>Password</p>
-    <input type="text" id="url" name="url" value={{password}}>
+    <input type="text" id="password" name="password" value={{password}}>
     <p>Age</p>
     <input type="text" id="age" name="age" value={{age}}>
     <p>City</p>
@@ -16,7 +16,7 @@
     <p>Website</p>
     <input type="text" id="url" name="url" value={{website}}>
    
-    <div><button id="button">Submit</button></div>
+    <div><button id="button">Update</button></div>
      
 
      {{!-- <input type="hidden" name="_csrf" value="{{csrfToken}}">

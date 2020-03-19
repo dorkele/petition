@@ -78,3 +78,11 @@ module.exports.getUserInfoForEdit = userId => {
     const params = [userId];
     return db.query(q, params);
 };
+
+module.exports.oldPWProfileUpdate = (first, last, email, userId) => {
+    const q = `UPDATE users
+    SET first=$1, last=$2, email=$3, 
+    WHERE $5 = users.id`;
+    const params = [first, last, email, userId];
+    return db.query(q, params);
+};
