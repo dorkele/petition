@@ -14,13 +14,15 @@ module.exports.addSignatures = (signature, user_id) => {
     return db.query(q, params);
 };
 
-module.exports.getSignatures = () => {
+module.exports.getSignatures = sigid => {
     const q = `
-    SELECT signature FROM signatures  
+    SELECT signature FROM signatures
+    WHERE users_id=$1 
 `;
-    return db.query(q);
+    const params = [sigid];
+    return db.query(q, params);
 };
-
+///jesu li gornja i donja query iste??
 module.exports.getSignature = id => {
     const q = `SELECT signature FROM SIGNATURES
         WHERE user_id=$1`;

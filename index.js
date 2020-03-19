@@ -44,7 +44,7 @@ app.post("/register", (req, res) => {
     const last = req.body.last;
     const email = req.body.email;
     const password = req.body.password;
-    console.log(first, last, email, password);
+    // console.log(first, last, email, password);
 
     hash(password)
         .then(hashedPw => {
@@ -53,8 +53,8 @@ app.post("/register", (req, res) => {
             db.insertUsers(first, last, email, hashedPw)
                 .then(result => {
                     req.session.userId = result.rows[0].id;
-                    console.log("result.rows[0].id: ", result.rows[0].id);
-                    res.redirect("/petition");
+                    // console.log("result.rows[0].id: ", result.rows[0].id);
+                    res.redirect("/profile");
                 })
                 .catch(err => {
                     res.render("register", {
@@ -80,16 +80,16 @@ app.post("/profile", (req, res) => {
     const city = req.body.city;
     let url = req.body.url;
     const user_id = req.session.userId;
-    console.log(age, city, url, user_id);
+    // console.log(age, city, url, user_id);
 
     if (!url.startsWith("http" || "https")) {
-        url = "http:" + url;
+        url = "http://" + url;
     }
 
     db.insertProfile(age, city, url, user_id) /////////// trebam li ovdje dodati jos nesto?
         .then(results => {
-            console.log(results);
-            res.redirect("/thanks");
+            // console.log(results);
+            res.redirect("/petition");
         })
         .catch(error => {
             console.log(error);
@@ -107,14 +107,14 @@ app.post("/login", (req, res) => {
             const hashedPw = result.rows[0].password;
             compare(req.body.password, hashedPw)
                 .then(matchValue => {
-                    console.log("match value of compare", matchValue);
+                    // console.log("match value of compare", matchValue);
                     if (matchValue == true) {
                         req.session.userId = result.rows[0].id;
-                        console.log("req.session.userId: ", req.session.userId);
+                        // console.log("req.session.userId: ", req.session.userId);
 
                         db.getSignature(req.session.userId).then(signature => {
                             if (signature.rows[0]) {
-                                console.log(signature.rows[0]);
+                                // console.log(signature.rows[0]);
 
                                 // console.log("result u getsignature: ", result);
                                 // console.log("req.session: ", req.session);
@@ -143,7 +143,7 @@ app.post("/login", (req, res) => {
 
 app.get("/petition", (req, res) => {
     console.log("made it to the GET petition route");
-    console.log("req.session u get petition: ", req.session);
+    // console.log("req.session u get petition: ", req.session);
 
     if (req.session.sigid) {
         res.redirect("/thanks");
@@ -157,14 +157,13 @@ app.get("/petition", (req, res) => {
 app.post("/petition", (req, res) => {
     console.log("made it to the POST petition route");
     const userId = req.session.userId;
-    console.log("req.session.userId u post petition: ", req.session.userId);
-    console.log("req.body u post petition: ", req.session.body);
+    // console.log("req.session.userId u post petition: ", req.session.userId);
+    // console.log("req.body u post petition: ", req.session.body);
 
     const signature = req.body.signature;
 
     // do insert of submitted data into database
     db.addSignatures(signature, userId)
-
         .then(result => {
             // console.log("req.session in addsignatures: ", req.session);
 
@@ -181,16 +180,17 @@ app.post("/petition", (req, res) => {
 });
 
 app.get("/thanks", (req, res) => {
+    /////////////////////// SLABA TOCKA NE ZNAM STO SE DOGADA!!!!//////////////
     // console.log("req.session.sigid: ", req.session.sigid);
     if (!req.session.sigid) {
         res.redirect("/petition");
     }
     const userId = req.session.userId;
-    // console.log("req.session.userId in get thanks: ", req.session.userId);
+    // console.log("req.session.sigid in get thanks: ", req.session.userId);
 
     db.getSignature(userId)
         .then(results => {
-            // console.log(results);
+            // console.log("results: ", results);
             res.render("thanks", {
                 signature: results.rows[0].signature
             });
@@ -228,7 +228,7 @@ app.get("/signers", (req, res) => {
 
 app.get("/signers/:city", (req, res) => {
     let city = req.params.city;
-    console.log("req.params.city: ", req.params.city);
+    // console.log("req.params.city: ", req.params.city);
 
     db.getSignersFromCity(city)
         .then(results => {
@@ -244,7 +244,7 @@ app.get("/signers/:city", (req, res) => {
                 city,
                 userInfo
             });
-            console.log("results");
+            // console.log("results");
         })
         .catch(error => {
             console.log(error);
