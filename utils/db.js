@@ -22,7 +22,7 @@ module.exports.getSignatures = sigid => {
     const params = [sigid];
     return db.query(q, params);
 };
-///jesu li gornja i donja query iste??
+///jesu li gornja i donja query iste??, je li mi gornja uopce potrebna???????
 module.exports.getSignature = id => {
     const q = `SELECT signature FROM SIGNATURES
         WHERE user_id=$1`;
@@ -68,5 +68,13 @@ module.exports.getSignersFromCity = city => {
     WHERE user_profiles.city=$1 
     `;
     const params = [city];
+    return db.query(q, params);
+};
+
+module.exports.getUserInfoForEdit = userId => {
+    const q = `SELECT * FROM users
+    LEFT JOIN user_profiles ON users.id = user_profiles.user_id
+    WHERE user_profiles.user_id=$1`;
+    const params = [userId];
     return db.query(q, params);
 };

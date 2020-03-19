@@ -96,6 +96,37 @@ app.post("/profile", (req, res) => {
         });
 });
 
+app.get("/profile/edit", (req, res) => {
+    console.log("in GET edit profile route");
+    console.log("req.body: ", req.body);
+    console.log("req.session: ", req.session);
+    const userId = req.session.userId;
+    db.getUserInfoForEdit(userId)
+        .then(results => {
+            const first = results.rows[0].first;
+            const last = results.rows[0].last;
+            const email = results.rows[0].email;
+            const password = results.rows[0].password; /////sakriti!!!!!!!!
+            const age = results.rows[0].age;
+            const city = results.rows[0].city;
+            const website = results.rows[0].url;
+            console.log(results.rows);
+            res.render("edit_profile", {
+                first,
+                last,
+                email,
+                password,
+                age,
+                city,
+                website
+            });
+        })
+        .catch(error => {
+            console.log(error);
+            res.render("edit_profile", { error });
+        });
+});
+
 app.get("/login", (req, res) => {
     res.render("login");
 });
