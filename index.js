@@ -51,7 +51,6 @@ app.post("/register", requireUserLoggedOut, (req, res) => {
     const last = req.body.last;
     const email = req.body.email;
     const password = req.body.password;
-    // console.log(first, last, email, password);
 
     hash(password)
         .then(hashedPw => {
@@ -60,7 +59,7 @@ app.post("/register", requireUserLoggedOut, (req, res) => {
             db.insertUsers(first, last, email, hashedPw)
                 .then(result => {
                     req.session.userId = result.rows[0].id;
-                    // console.log("result.rows[0].id: ", result.rows[0].id);
+
                     res.redirect("/profile");
                 })
                 .catch(err => {
@@ -85,6 +84,8 @@ app.post("/login", requireUserLoggedOut, (req, res) => {
     db.getPass(req.body.email)
         .then(result => {
             const hashedPw = result.rows[0].password;
+            console.log(req.body.password);
+
             compare(req.body.password, hashedPw)
                 .then(matchValue => {
                     if (matchValue == true) {
@@ -99,7 +100,7 @@ app.post("/login", requireUserLoggedOut, (req, res) => {
                             }
                         });
                     } else {
-                        res.render("login"); // renderirati ovdje error poruku!!!!!!!!!!!!!!!!!!!!!!!
+                        res.render("login", { error: true }); // renderirati ovdje error poruku!!!!!!!!!!!!!!!!!!!!!!!
                     }
                 })
                 .catch(error => {
@@ -124,16 +125,11 @@ app.get("/petition", requireUserNotSigned, (req, res) => {
 app.post("/petition", requireUserNotSigned, (req, res) => {
     console.log("made it to the POST petition route");
     const userId = req.session.userId;
-    // console.log("req.session.userId u post petition: ", req.session.userId);
-    // console.log("req.body u post petition: ", req.session.body);
 
     const signature = req.body.signature;
 
-    // do insert of submitted data into database
     db.addSignatures(signature, userId)
         .then(result => {
-            // console.log("req.session in addsignatures: ", req.session);
-
             req.session.sigid = result.rows[0].id; ///adding it to the object req.session
 
             res.redirect("/thanks");
@@ -147,21 +143,16 @@ app.post("/petition", requireUserNotSigned, (req, res) => {
 });
 
 app.get("/thanks", requireUserSigned, (req, res) => {
-    /////////////////////// SLABA TOCKA NE ZNAM STO SE DOGADA!!!!//////////////
-    // console.log("req.session.sigid: ", req.session.sigid);
-
     const userId = req.session.userId;
-    // console.log("req.session.sigid in get thanks: ", req.session.userId);
 
     db.getSignature(userId)
         .then(results => {
-            // console.log("results: ", results);
             res.render("thanks", {
                 signature: results.rows[0].signature
             });
         })
         .catch(err => {
-            console.log("err in getSignatures: ", err);
+            console.log(err);
         });
 });
 
@@ -169,14 +160,11 @@ app.post("/thanks", (req, res) => {
     let userId = req.session.userId;
     db.deleteSignature(userId)
         .then(result => {
-            console.log("result post thanks", result);
-            console.log("req.session: ", req.session);
-
             req.session.sigid = null;
             res.redirect("/petition");
         })
         .catch(error => {
-            console.log("error in post thanks: ", error); ///hendlaj
+            console.log(error);
         });
 });
 
@@ -208,7 +196,6 @@ app.get("/signers", requireUserSigned, (req, res) => {
 
 app.get("/signers/:city", requireUserSigned, (req, res) => {
     let city = req.params.city;
-    // console.log("req.params.city: ", req.params.city);
 
     db.getSignersFromCity(city)
         .then(results => {
@@ -224,10 +211,9 @@ app.get("/signers/:city", requireUserSigned, (req, res) => {
                 city,
                 userInfo
             });
-            // console.log("results");
         })
         .catch(error => {
-            console.log(error);
+            console.log("error in signers by city", error);
         });
 });
 
@@ -237,31 +223,28 @@ app.get("/profile", (req, res) => {
     } else {
         res.render("profile");
     }
-
-    console.log(req.session.profile);
 });
 
 app.post("/profile", (req, res) => {
     console.log("made it to the post profile");
 
     const age = req.body.age;
-    const city = req.body.city;
+    const city = req.body.city.toUpperCase();
     let url = req.body.url;
     const user_id = req.session.userId;
-    // console.log(age, city, url, user_id);
 
-    if (!url.startsWith("http" || "https")) {
+    if (!url.startsWith("http" || "https") && url != "") {
         url = "http://" + url;
     }
 
     db.insertProfile(age, city, url, user_id) /////////// trebam li ovdje dodati jos nesto?
         .then(results => {
-            // console.log(results);
             req.session.profile = true;
             res.redirect("/petition");
         })
         .catch(error => {
-            console.log(error);
+            console.log("error in post profile insert profile: ", error);
+            res.render("/profile", { error });
         });
 });
 
@@ -305,25 +288,23 @@ app.post("/profile/edit", (req, res) => {
     let email = req.body.email;
     let userId = req.session.userId;
     let age = req.body.age;
-    let city = req.body.city;
+    let city = req.body.city.toUpperCase();
     let url = req.body.url;
 
     if (newPassword == "") {
         db.oldPWProfileUpdate(first, last, email, userId)
             .then(results => {
-                console.log(results); ///handle
                 db.updateUserProfiles(age, city, url, userId)
                     .then(result => {
-                        console.log(result); ///handle
                         res.render("edit_profile");
                     })
                     .catch(error => {
-                        console.log("error in oldPW updateuserprof: ", error); ///handle
+                        console.log("error in oldPW updateuserprof: ", error);
                         res.render("edit_profile", { error });
                     });
             })
             .catch(error => {
-                console.log("error in oldPWProfileUpdate: ", error); ///handle
+                console.log("error in oldPWProfileUpdate: ", error);
                 res.render("edit_profile", { error });
             });
     } else {
@@ -331,31 +312,28 @@ app.post("/profile/edit", (req, res) => {
         hash(newPassword)
             .then(hashedPw => {
                 console.log("hashedPW", hashedPw);
-                // We will store the hashed PW and all other user info supplied in our DB
                 db.newPWProfileUpdate(first, last, email, hashedPw, userId)
                     .then(results => {
-                        console.log(results); ////handle
                         db.updateUserProfiles(age, city, url, userId)
                             .then(result => {
-                                console.log(result); ///handle
                                 res.redirect("/profile/edit");
                             })
                             .catch(error => {
                                 console.log(
                                     "error in newPW user ProfileUpdate: ",
                                     error
-                                ); ///handle
-                                res.redirect("/profile/edit", { error });
+                                );
+                                res.render("edit_profile", { error });
                             });
                     })
                     .catch(error => {
                         console.log("newpw profile update: ", error);
                         res.render("edit_profile", { error });
-                    }); ///handle
+                    });
             })
             .catch(err => {
                 console.log("error in Post register in hash", err);
-                res.render("register", { err });
+                res.render("edit_profile", { error: true });
             });
     }
 });
