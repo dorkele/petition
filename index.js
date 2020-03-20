@@ -135,17 +135,50 @@ app.post("/profile/edit", (req, res) => {
     let last = req.body.last;
     let email = req.body.email;
     let userId = req.session.userId;
+    let age = req.body.age;
+    let city = req.body.city;
+    let url = req.body.url;
 
     if (newPassword == "") {
         db.oldPWProfileUpdate(first, last, email, userId)
             .then(results => {
-                console.log(results);
+                console.log(results); ///handle
+                db.updateUserProfiles(age, city, url, userId)
+                    .then(result => {
+                        console.log(result); ///handle
+                        res.render("edit_profile");
+                    })
+                    .catch(error => {
+                        console.log("error in oldPW updateuserprof: ", error); ///handle
+                        res.render("edit_profile", { error });
+                    });
             })
             .catch(error => {
-                console.log("error in oldPWProfileUpdate: ", error);
+                console.log("error in oldPWProfileUpdate: ", error); ///handle
+                res.render("edit_profile", { error });
             });
     } else {
         console.log("something else");
+        db.newPWProfileUpdate(first, last, email, newPassword, userId)
+            .then(results => {
+                console.log(results); ////handle
+                db.updateUserProfiles(age, city, url, userId)
+                    .then(result => {
+                        console.log(result); ///handle
+                        res.render("edit_profile");
+                    })
+                    .catch(error => {
+                        console.log(
+                            "error in newPW user ProfileUpdate: ",
+                            error
+                        ); ///handle
+                        res.render("edit_profile", { error });
+                    });
+            })
+            .catch(error => {
+                console.log("newpw profile update: ", error);
+                res.render("edit_profile", { error });
+            }); ///handle
     }
 });
 
@@ -160,17 +193,11 @@ app.post("/login", (req, res) => {
             const hashedPw = result.rows[0].password;
             compare(req.body.password, hashedPw)
                 .then(matchValue => {
-                    // console.log("match value of compare", matchValue);
                     if (matchValue == true) {
                         req.session.userId = result.rows[0].id;
-                        // console.log("req.session.userId: ", req.session.userId);
 
                         db.getSignature(req.session.userId).then(signature => {
                             if (signature.rows[0]) {
-                                // console.log(signature.rows[0]);
-
-                                // console.log("result u getsignature: ", result);
-                                // console.log("req.session: ", req.session);
                                 req.session.sigid = result.rows[0].id;
                                 res.redirect("/thanks");
                             } else {
