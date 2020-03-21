@@ -1,5 +1,22 @@
+* {
+    margin: 0;
+    box-sizing: border-box;
+}
+
 body {
-    background-color: plum;
+    height: 100vh;
+    background-image: url("open_book_smaller.png");
+    background-size: 100%;
+    background-repeat: no-repeat;
+}
+
+.container {
+    height: 100%;
+    width: 100%;
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: 40px auto 40px;
 }
 
 canvas {

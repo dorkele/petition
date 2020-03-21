@@ -231,13 +231,13 @@ app.post("/profile", (req, res) => {
     const age = req.body.age;
     const city = req.body.city.toUpperCase();
     let url = req.body.url;
-    const user_id = req.session.userId;
+    const userId = req.session.userId;
 
     if (!url.startsWith("http" || "https") && url != "") {
         url = "http://" + url;
     }
 
-    db.insertProfile(age, city, url, user_id) /////////// trebam li ovdje dodati jos nesto?
+    db.insertProfile(age, city, url, userId) /////////// trebam li ovdje dodati jos nesto?
         .then(results => {
             req.session.profile = true;
             res.redirect("/petition");
@@ -249,20 +249,17 @@ app.post("/profile", (req, res) => {
 });
 
 app.get("/profile/edit", (req, res) => {
-    console.log("in GET edit profile route");
-    console.log("req.body: ", req.body);
-    console.log("req.session: ", req.session);
     const userId = req.session.userId;
     db.getUserInfoForEdit(userId)
         .then(results => {
             const first = results.rows[0].first;
             const last = results.rows[0].last;
             const email = results.rows[0].email;
-            const password = results.rows[0].password; /////sakriti!!!!!!!!
+            const password = results.rows[0].password;
             const age = results.rows[0].age;
             const city = results.rows[0].city;
             const website = results.rows[0].url;
-            console.log(results.rows);
+
             res.render("edit_profile", {
                 first,
                 last,
@@ -340,7 +337,7 @@ app.post("/profile/edit", (req, res) => {
 
 app.get("/logout", (req, res) => {
     req.session = null;
-    res.redirect("/register");
+    res.redirect("/login");
 });
 
 app.listen(process.env.PORT || port, () =>
