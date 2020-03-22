@@ -242,7 +242,7 @@ app.post("/profile", (req, res) => {
     }
 
     db.insertProfile(age, city, url, userId)
-        .then(results => {
+        .then(() => {
             res.redirect("/");
         })
         .catch(error => {
