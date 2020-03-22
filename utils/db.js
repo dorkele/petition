@@ -44,11 +44,11 @@ module.exports.getUserInfo = () => {
     return db.query(q);
 };
 
-module.exports.insertProfile = (age, city, url, user_id) => {
+module.exports.insertProfile = (age, city, url, userId) => {
     const q = `INSERT INTO user_profiles (age, city, url, user_id)
     VALUES ($1, $2, $3, $4)
     RETURNING *`;
-    const params = [age, city, url, user_id];
+    const params = [age, city, url, userId];
     return db.query(q, params);
 };
 

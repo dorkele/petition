@@ -46,6 +46,10 @@ body {
     padding: 20% 10%;
 }
 
+#right {
+    font-size: 12px;
+}
+
 .padding-bottom {
     padding-bottom: 10%;
 }

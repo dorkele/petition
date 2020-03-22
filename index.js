@@ -55,7 +55,7 @@ app.post("/register", requireUserLoggedOut, (req, res) => {
     hash(password)
         .then(hashedPw => {
             console.log("hashedPW", hashedPw);
-            // We will store the hashed PW and all other user info supplied in our DB
+
             db.insertUsers(first, last, email, hashedPw)
                 .then(result => {
                     req.session.userId = result.rows[0].id;
@@ -193,6 +193,7 @@ app.get("/signers", requireUserSigned, (req, res) => {
             }
 
             res.render("signers", {
+                number: results.rows.length,
                 userInfo
             });
         })
@@ -244,7 +245,7 @@ app.post("/profile", (req, res) => {
         url = "http://" + url;
     }
 
-    db.insertProfile(age, city, url, userId) /////////// trebam li ovdje dodati jos nesto?
+    db.insertProfile(age, city, url, userId)
         .then(results => {
             req.session.profile = true;
             res.redirect("/petition");
