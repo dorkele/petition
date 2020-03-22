@@ -101,7 +101,7 @@ app.post("/login", requireUserLoggedOut, (req, res) => {
                                     req.session.sigid = result.rows[0].id;
                                     res.redirect("/thanks");
                                 } else {
-                                    res.redirect("/petition");
+                                    res.redirect("/");
                                 }
                             })
                             .catch(error => {
@@ -124,13 +124,13 @@ app.post("/login", requireUserLoggedOut, (req, res) => {
         });
 });
 
-app.get("/petition", requireUserNotSigned, (req, res) => {
+app.get("/", requireUserNotSigned, (req, res) => {
     console.log("made it to the GET petition route");
     // console.log("req.session u get petition: ", req.session);
     res.render("petition");
 });
 
-app.post("/petition", (req, res) => {
+app.post("/", (req, res) => {
     console.log("made it to the POST petition route");
     const userId = req.session.userId;
 
@@ -168,7 +168,7 @@ app.post("/thanks", (req, res) => {
     db.deleteSignature(userId)
         .then(result => {
             req.session.sigid = null;
-            res.redirect("/petition");
+            res.redirect("/");
         })
         .catch(error => {
             console.log(error);
@@ -177,7 +177,7 @@ app.post("/thanks", (req, res) => {
 
 app.get("/signers", requireUserSigned, (req, res) => {
     if (!req.session.sigid) {
-        res.redirect("/petition");
+        res.redirect("/");
     }
     db.getUserInfo()
         .then(results => {
@@ -243,12 +243,11 @@ app.post("/profile", (req, res) => {
 
     db.insertProfile(age, city, url, userId)
         .then(results => {
-            req.session.profile = true;
-            res.redirect("/petition");
+            res.redirect("/");
         })
         .catch(error => {
             console.log("error in post profile insert profile: ", error);
-            res.render("/profile", { error });
+            res.render("profile", { error });
         });
 });
 

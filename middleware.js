@@ -6,7 +6,7 @@ module.exports.safeCookies = (req, res, next) => {
 
 module.exports.requireUserLoggedOut = (req, res, next) => {
     if (req.session.userId) {
-        res.redirect("/petition");
+        res.redirect("/");
     } else {
         next();
     }
@@ -14,7 +14,7 @@ module.exports.requireUserLoggedOut = (req, res, next) => {
 
 module.exports.requireUserSigned = (req, res, next) => {
     if (!req.session.sigid) {
-        res.redirect("/petition");
+        res.redirect("/");
     } else {
         next();
     }
