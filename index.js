@@ -166,7 +166,7 @@ app.get("/thanks", requireUserSigned, (req, res) => {
 app.post("/thanks", (req, res) => {
     let userId = req.session.userId;
     db.deleteSignature(userId)
-        .then(result => {
+        .then(() => {
             req.session.sigid = null;
             res.redirect("/");
         })
@@ -297,12 +297,12 @@ app.post("/profile/edit", (req, res) => {
 
     if (newPassword == "") {
         db.oldPWProfileUpdate(first, last, email, userId)
-            .then(results => {
+            .then(() => {
                 if (!url.startsWith("http" || "https") && url != "") {
                     url = "http://" + url;
                 }
                 db.updateUserProfiles(age, city, url, userId)
-                    .then(result => {
+                    .then(() => {
                         res.redirect("/profile/edit");
                     })
                     .catch(error => {
@@ -320,14 +320,14 @@ app.post("/profile/edit", (req, res) => {
             .then(hashedPw => {
                 console.log("hashedPW", hashedPw);
                 db.newPWProfileUpdate(first, last, email, hashedPw, userId)
-                    .then(results => {
+                    .then(() => {
                         if (!url.startsWith("http" || "https") && url != "") {
                             url = "http://" + url;
                         }
                         console.log(url);
 
                         db.updateUserProfiles(age, city, url, userId)
-                            .then(result => {
+                            .then(() => {
                                 res.redirect("/profile/edit");
                             })
                             .catch(error => {
