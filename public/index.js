@@ -1,8 +1,5 @@
-// A js file to load on petition page
-// allows users to draw their signature
-// puts the data url from the canvas into the value of a hidden form field
 (function() {
-    var canvas = document.getElementById("canv"); /////////////zasto ovo ne funkcionira s jquery?? ako sve bude radilo u vanilla js probati prebaciti u jquery
+    var canvas = document.getElementById("canv");
     var ctx = canvas.getContext("2d");
 
     var start = {
@@ -22,7 +19,7 @@
             return;
         } else {
             ctx.beginPath();
-            ctx.strokeStyle = "violet";
+            ctx.strokeStyle = "crimson";
             ctx.lineWidth = 2;
 
             ctx.moveTo(start.x, start.y);

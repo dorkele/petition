@@ -1,11 +1,17 @@
 * {
     margin: 0;
     box-sizing: border-box;
+    font-family: "Libre Baskerville", serif;
+    font-size: 13px;
+}
+
+html {
+    height: 100%;
 }
 
 body {
-    height: 100vh;
-    background-image: url("open_book_smaller.png");
+    height: 100%;
+    background-image: url("open_book_lower.png");
     background-size: 100%;
     background-repeat: no-repeat;
 }
@@ -15,10 +21,157 @@ body {
     width: 100%;
     position: relative;
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    grid-template-rows: 40px auto 40px;
+    grid-template-columns: 30% 21% 20% 29%;
+    grid-template-rows: 10% 65% 20% 10%;
+}
+
+.canvas {
+    align-self: center;
+}
+
+.left {
+    grid-column: 2 / 3;
+    grid-row: 2 / 3;
+    padding: 20% 7% 0 2%;
+    display: flex;
+    flex-direction: column;
+    text-align: justify;
+}
+
+.right {
+    display: flex;
+    flex-direction: column;
+    grid-column: 3 / 4;
+    grid-row: 2 / 3;
+    padding: 20% 10%;
+}
+
+.padding-bottom {
+    padding-bottom: 10%;
+}
+
+.link {
+    text-align: center;
+    padding-top: 5%;
+    align-self: flex-end;
+    text-decoration: none;
+    color: crimson;
+}
+
+.error {
+    color: red;
+}
+
+input {
+    border: 0;
+    outline: 0;
+    border-bottom: 1px solid black;
+    background-color: transparent;
+    color: crimson;
+}
+
+input:focus {
+    background-color: transparent;
+    border-bottom: 2px solid crimson;
+}
+
+.input-fields {
+    padding-bottom: 3%;
+}
+
+.inputs {
+    padding: 5%;
+}
+
+.button {
+    align-self: flex-end;
+}
+
+#button {
+    font-size: 16px;
+    height: 30px;
+    width: 100px;
+    border: 0;
+    outline: 0;
+    background-color: transparent;
+}
+
+#button:hover {
+    color: crimson;
+}
+
+.top-left {
+    grid-column: 1 / 2;
+    grid-row: 1 / 2;
+    font-size: 20px;
+    text-decoration: none;
+    color: white;
+    padding: 5% 5%;
+}
+
+.top-left:hover {
+    color: crimson;
+}
+.top-left-middle:hover {
+    color: crimson;
+}
+
+.top-right:hover {
+    color: crimson;
+}
+.top-right-middle:hover {
+    color: crimson;
+}
+
+.top-left-middle {
+    grid-column: 1 / 2;
+    grid-row: 2 / 3;
+    font-size: 20px;
+    text-decoration: none;
+    color: white;
+    padding: 5% 5%;
+}
+
+.top-right {
+    grid-column: 4 / 5;
+    grid-row: 1 / 2;
+    text-align: end;
+    padding: 5% 5%;
+    font-size: 20px;
+    text-decoration: none;
+    color: white;
+}
+.top-right-middle {
+    grid-column: 4 / 5;
+    grid-row: 2 / 3;
+    text-align: end;
+    padding: 5% 5%;
+    font-size: 20px;
+    text-decoration: none;
+    color: white;
 }
 
 canvas {
     background-color: white;
+}
+
+#delete {
+    font-size: 12px;
+    height: 30px;
+    width: 100px;
+    border: 0;
+    outline: 0;
+    background-color: transparent;
+}
+
+#delete:hover {
+    color: crimson;
+}
+
+#edit {
+    padding-left: 5%;
+}
+
+#black {
+    color: black;
 }

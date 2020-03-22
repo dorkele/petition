@@ -1,16 +1,23 @@
-<div>If you wish, give us some more information about you:</div>
-<form method="POST">
-    {{#if error}} <div>O-ou, something went wrong. We are very sorry, please try again!</div> {{/if}}
+<div class="container">
+    <div class="left">
+<div>If you wish, let us get to know you better:</div>
+{{#if error}} <div class="error input-fields">O-ou, something went wrong. We are very sorry, please try again!</div> {{/if}}
+</div>
+<form class="right" method="POST">
+    <div class="input-fields">
     <p>Age</p>
     <input type="text" id="age" name="age">
+    </div>
+    <div class="input-fields">
     <p>City</p>
     <input type="text" id="city" name="city">
+    </div>
+    <div class="input-fields">
     <p>Website</p>
     <input type="text" id="url" name="url">
-   
-    <div><button id="button">Submit</button></div>
-     
-
-      <input type="hidden" name="_csrf" value="{{csrfToken}}">
-    {{!-- add this form field in every form i will have!!!!!! --}}
+   </div>
+    <div class="button"><button id="button">SUBMIT</button></div>
+    <input type="hidden" name="_csrf" value="{{csrfToken}}">
+    
 </form>
+</div>

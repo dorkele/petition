@@ -1,10 +1,29 @@
-
+<div class="container">
+    <a class="top-left" href="/profile/edit">Edit Profile</a>
+<a class="top-right" href="/logout">Log Out</a>
+    <div class="left">
+        <h2 class="padding-bottom">Epilogue: Found in Translation</h2>
+        <div class="padding-bottom">
+    <p class="padding-bottom">
+    Translators are a rare species whose skills range from linguistic conquering of multiple languages to ascetic self-discipline and modesty. They are a crucial link in the process of exchanging ideas, knowledge and experience between people and cultures. Even though, without them, we could not get closer to the mysterious notions of connection and understanding, they are often overlooked and neglected.
+</p>
 <div>Thank you for signing the petition!</div>
-<img src="{{signature}}">
-<form method="POST">
-<button>DELETE SIGNATURE</button>
+</div>
+
+
+ <a class="link" href="/signers">See the list of all the signers.</a>
+</div>
+
+<form class="right canvas" method="POST">
+    <div class="input-fields">
+    <img src="{{signature}}" >
+    </div>
+    
+<button class="button" id="delete">DELETE SIGNATURE</button>
+
  <input type="hidden" name="_csrf" value="{{csrfToken}}">
+
 </form>
 
-<a href="/signers">See the list of all the signers.</a>
-{{!-- Just says thanks and has a link to the signers page --}}
+
+</div>

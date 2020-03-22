@@ -81,26 +81,34 @@ app.get("/login", requireUserLoggedOut, (req, res) => {
 
 app.post("/login", requireUserLoggedOut, (req, res) => {
     console.log("/POST LOGIN");
+    console.log("req.body: ", req.body);
+
     db.getPass(req.body.email)
         .then(result => {
             const hashedPw = result.rows[0].password;
-            console.log(req.body.password);
+            const password = req.body.password;
+            const id = result.rows[0].id;
 
-            compare(req.body.password, hashedPw)
+            compare(password, hashedPw)
                 .then(matchValue => {
                     if (matchValue == true) {
-                        req.session.userId = result.rows[0].id;
+                        console.log("result.rows[0].id: ", result.rows[0].id);
 
-                        db.getSignature(req.session.userId).then(signature => {
-                            if (signature.rows[0]) {
-                                req.session.sigid = result.rows[0].id;
-                                res.redirect("/thanks");
-                            } else {
-                                res.redirect("/petition");
-                            }
-                        });
+                        req.session.userId = id;
+                        db.getSignature(req.session.userId)
+                            .then(signature => {
+                                if (signature.rows[0]) {
+                                    req.session.sigid = result.rows[0].id;
+                                    res.redirect("/thanks");
+                                } else {
+                                    res.redirect("/petition");
+                                }
+                            })
+                            .catch(error => {
+                                res.render("login", { error });
+                            });
                     } else {
-                        res.render("login", { error: true }); // renderirati ovdje error poruku!!!!!!!!!!!!!!!!!!!!!!!
+                        res.render("login", { error: true });
                     }
                 })
                 .catch(error => {
@@ -122,7 +130,7 @@ app.get("/petition", requireUserNotSigned, (req, res) => {
     res.render("petition");
 });
 
-app.post("/petition", requireUserNotSigned, (req, res) => {
+app.post("/petition", (req, res) => {
     console.log("made it to the POST petition route");
     const userId = req.session.userId;
 
@@ -130,8 +138,7 @@ app.post("/petition", requireUserNotSigned, (req, res) => {
 
     db.addSignatures(signature, userId)
         .then(result => {
-            req.session.sigid = result.rows[0].id; ///adding it to the object req.session
-
+            req.session.sigid = result.rows[0].id;
             res.redirect("/thanks");
         })
         .catch(error => {
@@ -250,6 +257,7 @@ app.post("/profile", (req, res) => {
 
 app.get("/profile/edit", (req, res) => {
     const userId = req.session.userId;
+
     db.getUserInfoForEdit(userId)
         .then(results => {
             const first = results.rows[0].first;
@@ -258,7 +266,10 @@ app.get("/profile/edit", (req, res) => {
             const password = results.rows[0].password;
             const age = results.rows[0].age;
             const city = results.rows[0].city;
-            const website = results.rows[0].url;
+            let url = results.rows[0].url;
+            if (!url.startsWith("http" || "https") && url != "") {
+                url = "http://" + url;
+            }
 
             res.render("edit_profile", {
                 first,
@@ -267,7 +278,7 @@ app.get("/profile/edit", (req, res) => {
                 password,
                 age,
                 city,
-                website
+                url
             });
         })
         .catch(error => {
@@ -291,9 +302,12 @@ app.post("/profile/edit", (req, res) => {
     if (newPassword == "") {
         db.oldPWProfileUpdate(first, last, email, userId)
             .then(results => {
+                if (!url.startsWith("http" || "https") && url != "") {
+                    url = "http://" + url;
+                }
                 db.updateUserProfiles(age, city, url, userId)
                     .then(result => {
-                        res.render("edit_profile");
+                        res.redirect("/profile/edit");
                     })
                     .catch(error => {
                         console.log("error in oldPW updateuserprof: ", error);
@@ -311,6 +325,11 @@ app.post("/profile/edit", (req, res) => {
                 console.log("hashedPW", hashedPw);
                 db.newPWProfileUpdate(first, last, email, hashedPw, userId)
                     .then(results => {
+                        if (!url.startsWith("http" || "https") && url != "") {
+                            url = "http://" + url;
+                        }
+                        console.log(url);
+
                         db.updateUserProfiles(age, city, url, userId)
                             .then(result => {
                                 res.redirect("/profile/edit");

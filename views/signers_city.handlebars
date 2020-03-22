@@ -1,13 +1,23 @@
-<div>Here is a list of signers from {{city}} who care about this as much as you do:</div>
 
+<div class="container">
+    <a class="top-left" href="/profile/edit">Edit Profile</a>
+    <a class="top-left-middle" href="/petition">Petition</a>
+<a class="top-right" href="/logout">Log Out</a>
+<a class="top-right-middle" href="/signers">Signers</a>
+<div class="left">
+<div id="edit">Here is a list of signers from {{city}} who care about this as much as you do:</div>
+</div>
+<div class="right">
  {{#userInfo}}
 
 <div>
-    <a href="{{url}}">{{signers}}</a>{{age}}
+    {{#if url}}<a class="link" href="{{url}}">{{signers}}</a> {{else}} {{signers}}{{/if}}, {{age}}
 </div>
 
 
  {{/userInfo}} 
+</div>
+ </div>
 
 
 

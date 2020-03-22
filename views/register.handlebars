@@ -1,19 +1,44 @@
-{{!-- conditionally renders an error message --}}
-<h1>Petition to stop signing petitions</h1>
-<div>Please register first.</div>
-<form method="POST">
-    {{#if err}} <div>O-ou, something went wrong. We are very sorry, please try again!</div> {{/if}}
+<div class="container">
+    <div class="left">
+ <h2 class="padding-bottom">1. Lost in Translation</h2>
+<div class="padding-bottom">
+    <p class="padding-bottom">
+    Translators are a rare species whose skills range from linguistic conquering of multiple languages to ascetic self-discipline and modesty. They are a crucial link in the process of exchanging ideas, knowledge and experience between people and cultures. Even though, without them, we could not get closer to the mysterious notions of connection and understanding, they are often overlooked and neglected.
+</p>
+<p>Sign this petition to help them in demanding better working conditions and financial compensation for the important work they are doing.
+</p>
+</div>
+
+    {{#if err}} <div class="error">O-ou, something went wrong. We are very sorry, please try again!</div> {{/if}}
+    
+    </div>
+    
+<form class="right" method="POST">
+    <div class="input-fields">
+    <div>To sign the petition please register first:</div>
+    </div>
+    <div class="input-fields">
     <p>First name</p>
-    <input type="text" id="first" name="first">
+    <input type="text" id="first" name="first" >
+    </div>
+    <div class="input-fields">
     <p>Last name</p>
-    <input type="text" id="last" name="last">
-    <p>Email</p>
-    <input type="text" id="email" name="email">
+    <input type="text" id="last" name="last" >
+    </div>
+    <div class="input-fields">
+    <p>E-mail</p>
+    <input type="text" id="email" name="email" >
+    </div>
+    <div class="input-fields" id="password">
     <p>Password</p>
-    <input type="password" id="password" name="password">
-    <div><button id="button">Submit</button></div>
-     
-     <a href="login">Already registered?</a>
+    <input type="password" id="password" name="password" >
+    </div>
+   
+    <div class="button"><button id="button">REGISTER</button></div>
       <input type="hidden" name="_csrf" value="{{csrfToken}}">
-    {{!-- add this form field in every form i will have!!!!!! --}}
+
+    <div class="link" id="black"><p>Already registered? <a class="link" href="/login">Log in</a></p></div> 
+
 </form>
+     
+     </div>

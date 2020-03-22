@@ -1,15 +1,29 @@
-{{!-- conditionally renders an error message --}}
 <div class="container">
-<h1>Please log in</h1>
-<form method="POST">
-    {{#if error}} <div>O-ou, something went wrong. We are very sorry, please try again!</div> {{/if}}
+    <div class="left">
+<h2 class="padding-bottom">1. Lost in Translation</h2>
+<div class="padding-bottom">
+    <p class="padding-bottom">
+    Translators are a rare species whose skills range from linguistic conquering of multiple languages to ascetic self-discipline and modesty. They are a crucial link in the process of exchanging ideas, knowledge and experience between people and cultures. Even though, without them, we could not get closer to the mysterious notions of connection and understanding, they are often overlooked and neglected.
+</p>
+<p>Sign this petition to help them in demanding better working conditions and financial compensation for the important work they are doing.
+</p>
+</div>
+
+<div>You don't have a profile yet? <a class="link" href="register">Register here.</a></div>
+</div>
+<form class="right" method="POST">
+    <div class="input-fields">
     <p>Email</p>
     <input type="text" id="email" name="email">
+    </div>
+    <div class="input-fields">
     <p>Password</p>
     <input type="password" id="password" name="password">
-    <div><button id="button">Submit</button></div>
+    </div>
+    <div class="button"><button id="button">SUBMIT</button></div>
      <input type="hidden" name="_csrf" value="{{csrfToken}}">
-     <a href="register">Not registered?</a>
-    {{!-- add this form field in every form i will have!!!!!! --}}
+     {{#if error}} <div class="error input-fields">O-ou, something went wrong. We are very sorry, please try again!</div> {{/if}}
+     
 </form>
+
 </div>
