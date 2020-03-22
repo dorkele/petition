@@ -226,11 +226,7 @@ app.get("/signers/:city", requireUserSigned, (req, res) => {
 });
 
 app.get("/profile", (req, res) => {
-    if (req.session.profile == true) {
-        res.redirect("/profile/edit");
-    } else {
-        res.render("profile");
-    }
+    res.render("profile");
 });
 
 app.post("/profile", (req, res) => {
