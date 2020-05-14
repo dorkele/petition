@@ -14,8 +14,9 @@ module.exports.addSignatures = (signature, user_id) => {
     return db.query(q, params);
 };
 
-module.exports.getSignature = id => {
-    const q = `SELECT signature FROM SIGNATURES
+module.exports.getSignature = (id) => {
+    const q = `SELECT first, signature FROM users
+        JOIN signatures ON users.id = signatures.user_id
         WHERE user_id=$1`;
     const params = [id];
     return db.query(q, params);
@@ -29,7 +30,7 @@ module.exports.insertUsers = (first, last, email, password) => {
     return db.query(q, params);
 };
 
-module.exports.getPass = email => {
+module.exports.getPass = (email) => {
     const q = `SELECT id, password FROM users
     WHERE email=$1`;
     const params = [email];
@@ -52,7 +53,7 @@ module.exports.insertProfile = (age, city, url, userId) => {
     return db.query(q, params);
 };
 
-module.exports.getSignersFromCity = city => {
+module.exports.getSignersFromCity = (city) => {
     const q = `SELECT * FROM users
     JOIN signatures ON users.id = signatures.user_id
     LEFT OUTER JOIN user_profiles ON users.id = user_profiles.user_id
@@ -62,7 +63,7 @@ module.exports.getSignersFromCity = city => {
     return db.query(q, params);
 };
 
-module.exports.getUserInfoForEdit = userId => {
+module.exports.getUserInfoForEdit = (userId) => {
     const q = `SELECT * FROM users
     LEFT JOIN user_profiles ON users.id = user_profiles.user_id
     WHERE user_profiles.user_id=$1`;
@@ -98,7 +99,7 @@ module.exports.updateUserProfiles = (age, city, url, userId) => {
     return db.query(q, params);
 };
 
-module.exports.deleteSignature = userId => {
+module.exports.deleteSignature = (userId) => {
     const q = `DELETE FROM signatures
     WHERE user_id=$1`;
     const params = [userId];

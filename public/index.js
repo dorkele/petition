@@ -1,15 +1,18 @@
-(function() {
+(function () {
     var canvas = document.getElementById("canv");
     var ctx = canvas.getContext("2d");
 
     var start = {
         x: 0,
-        y: 0
+        y: 0,
     };
 
     function startPosition(e) {
         start.x = e.clientX - canvas.offsetLeft;
         start.y = e.clientY - canvas.offsetTop;
+
+        console.log(start.x, e.clientX, canvas.offsetLeft);
+        //console.log(start.y, canvas.offsetTop);
     }
 
     canvas.addEventListener("mousedown", startPosition);
@@ -20,7 +23,7 @@
         } else {
             ctx.beginPath();
             ctx.strokeStyle = "crimson";
-            ctx.lineWidth = 2;
+            ctx.lineWidth = 1;
 
             ctx.moveTo(start.x, start.y);
             startPosition(e);
@@ -31,7 +34,7 @@
 
     var canvInput = document.getElementById("canv-input");
 
-    canvas.addEventListener("mouseup", function() {
+    canvas.addEventListener("mouseup", function () {
         canvInput.value = canvas.toDataURL();
     });
 })();
