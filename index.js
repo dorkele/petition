@@ -11,7 +11,7 @@ const {
     requireUserLoggedOut,
     requireUserLoggedIn,
     requireUserSigned,
-    requireUserNotSigned
+    requireUserNotSigned,
 } = require("./middleware");
 
 app.engine("handlebars", hb());
@@ -20,18 +20,19 @@ app.set("view engine", "handlebars");
 app.use(
     require("cookie-session")({
         secret: "very secret",
-        maxAge: 1000 * 60 * 60 * 24 * 14
+        maxAge: 1000 * 60 * 60 * 24 * 14,
     })
 );
+
 app.use(cookieParser());
 
 app.use(
     express.urlencoded({
-        extended: false
+        extended: false,
     })
 );
 
-app.use(csurf()); //// has to come after urlencoded, body parsing and cookie session must come before this - token is in the req.body
+app.use(csurf());
 
 app.use(safeCookies);
 
@@ -40,37 +41,29 @@ app.use(express.static("public"));
 app.use(requireUserLoggedIn);
 
 app.get("/register", requireUserLoggedOut, (req, res) => {
-    console.log("GET REGISTER");
     res.render("register");
 });
 
 app.post("/register", requireUserLoggedOut, (req, res) => {
-    console.log("post/register happening");
-
     const first = req.body.first;
     const last = req.body.last;
     const email = req.body.email;
     const password = req.body.password;
 
     hash(password)
-        .then(hashedPw => {
-            console.log("hashedPW", hashedPw);
-
+        .then((hashedPw) => {
             db.insertUsers(first, last, email, hashedPw)
-                .then(result => {
+                .then((result) => {
                     req.session.userId = result.rows[0].id;
-
                     res.redirect("/profile");
                 })
-                .catch(err => {
+                .catch((err) => {
                     res.render("register", {
-                        err
+                        err,
                     });
-                    console.log("error in password catch: ", err);
                 });
         })
-        .catch(err => {
-            console.log("error in Post register in hash", err);
+        .catch((err) => {
             res.render("register", { err });
         });
 });
@@ -80,23 +73,17 @@ app.get("/login", requireUserLoggedOut, (req, res) => {
 });
 
 app.post("/login", requireUserLoggedOut, (req, res) => {
-    console.log("/POST LOGIN");
-    console.log("req.body: ", req.body);
-
     db.getPass(req.body.email)
-        .then(result => {
+        .then((result) => {
             const hashedPw = result.rows[0].password;
             const password = req.body.password;
             const id = result.rows[0].id;
-
             compare(password, hashedPw)
-                .then(matchValue => {
+                .then((matchValue) => {
                     if (matchValue == true) {
-                        console.log("result.rows[0].id: ", result.rows[0].id);
-
                         req.session.userId = id;
                         db.getSignature(req.session.userId)
-                            .then(signature => {
+                            .then((signature) => {
                                 if (signature.rows[0]) {
                                     req.session.sigid = result.rows[0].id;
                                     res.redirect("/thanks");
@@ -104,47 +91,39 @@ app.post("/login", requireUserLoggedOut, (req, res) => {
                                     res.redirect("/");
                                 }
                             })
-                            .catch(error => {
+                            .catch((error) => {
                                 res.render("login", { error });
                             });
                     } else {
                         res.render("login", { error: true });
                     }
                 })
-                .catch(error => {
-                    console.log("error in POST login compare", error);
+                .catch((error) => {
                     res.render("login", {
-                        error
+                        error,
                     });
                 });
         })
-        .catch(error => {
-            console.log("error in post login: ", error);
+        .catch((error) => {
             res.render("login", { error });
         });
 });
 
 app.get("/", requireUserNotSigned, (req, res) => {
-    console.log("made it to the GET petition route");
-    // console.log("req.session u get petition: ", req.session);
     res.render("petition");
 });
 
 app.post("/", (req, res) => {
-    console.log("made it to the POST petition route");
     const userId = req.session.userId;
-
     const signature = req.body.signature;
-
     db.addSignatures(signature, userId)
-        .then(result => {
+        .then((result) => {
             req.session.sigid = result.rows[0].id;
             res.redirect("/thanks");
         })
-        .catch(error => {
-            console.log("error in addsignatures : ", error);
+        .catch((error) => {
             res.render("petition", {
-                error
+                error,
             });
         });
 });
@@ -153,12 +132,13 @@ app.get("/thanks", requireUserSigned, (req, res) => {
     const userId = req.session.userId;
 
     db.getSignature(userId)
-        .then(results => {
+        .then((results) => {
             res.render("thanks", {
-                signature: results.rows[0].signature
+                first: results.rows[0].first,
+                signature: results.rows[0].signature,
             });
         })
-        .catch(err => {
+        .catch((err) => {
             console.log(err);
         });
 });
@@ -170,7 +150,7 @@ app.post("/thanks", (req, res) => {
             req.session.sigid = null;
             res.redirect("/");
         })
-        .catch(error => {
+        .catch((error) => {
             console.log(error);
         });
 });
@@ -180,7 +160,7 @@ app.get("/signers", requireUserSigned, (req, res) => {
         res.redirect("/");
     }
     db.getUserInfo()
-        .then(results => {
+        .then((results) => {
             let userInfo = [];
 
             for (let i = 0; i < results.rows.length; i++) {
@@ -188,16 +168,16 @@ app.get("/signers", requireUserSigned, (req, res) => {
                     signers: results.rows[i].first + " " + results.rows[i].last,
                     age: results.rows[i].age,
                     city: results.rows[i].city,
-                    url: results.rows[i].url
+                    url: results.rows[i].url,
                 });
             }
 
             res.render("signers", {
                 number: results.rows.length,
-                userInfo
+                userInfo,
             });
         })
-        .catch(err => {
+        .catch((err) => {
             console.log("err in getUserInfo: ", err);
         });
 });
@@ -206,21 +186,21 @@ app.get("/signers/:city", requireUserSigned, (req, res) => {
     let city = req.params.city;
 
     db.getSignersFromCity(city)
-        .then(results => {
-            let userInfo = []; ////provjeriti mogu li ovaj kod ne ponoviti ovako plain jane
+        .then((results) => {
+            let userInfo = [];
             for (let i = 0; i < results.rows.length; i++) {
                 userInfo.push({
                     signers: results.rows[i].first + " " + results.rows[i].last,
                     age: results.rows[i].age,
-                    url: results.rows[i].url
+                    url: results.rows[i].url,
                 });
             }
             res.render("signers_city", {
                 city,
-                userInfo
+                userInfo,
             });
         })
-        .catch(error => {
+        .catch((error) => {
             console.log("error in signers by city", error);
         });
 });
@@ -230,8 +210,6 @@ app.get("/profile", (req, res) => {
 });
 
 app.post("/profile", (req, res) => {
-    console.log("made it to the post profile");
-
     const age = req.body.age;
     const city = req.body.city.toUpperCase();
     let url = req.body.url;
@@ -245,8 +223,7 @@ app.post("/profile", (req, res) => {
         .then(() => {
             res.redirect("/");
         })
-        .catch(error => {
-            console.log("error in post profile insert profile: ", error);
+        .catch((error) => {
             res.render("profile", { error });
         });
 });
@@ -255,7 +232,7 @@ app.get("/profile/edit", (req, res) => {
     const userId = req.session.userId;
 
     db.getUserInfoForEdit(userId)
-        .then(results => {
+        .then((results) => {
             const first = results.rows[0].first;
             const last = results.rows[0].last;
             const email = results.rows[0].email;
@@ -274,18 +251,15 @@ app.get("/profile/edit", (req, res) => {
                 password,
                 age,
                 city,
-                url
+                url,
             });
         })
-        .catch(error => {
-            console.log(error);
+        .catch((error) => {
             res.render("edit_profile", { error });
         });
 });
 
 app.post("/profile/edit", (req, res) => {
-    console.log("I AM IN POST PROFILE EDIT ROUTE");
-
     let newPassword = req.body.password;
     let first = req.body.first;
     let last = req.body.last;
@@ -305,46 +279,34 @@ app.post("/profile/edit", (req, res) => {
                     .then(() => {
                         res.redirect("/profile/edit");
                     })
-                    .catch(error => {
-                        console.log("error in oldPW updateuserprof: ", error);
+                    .catch((error) => {
                         res.render("edit_profile", { error });
                     });
             })
-            .catch(error => {
-                console.log("error in oldPWProfileUpdate: ", error);
+            .catch((error) => {
                 res.render("edit_profile", { error });
             });
     } else {
-        console.log("something else");
         hash(newPassword)
-            .then(hashedPw => {
-                console.log("hashedPW", hashedPw);
+            .then((hashedPw) => {
                 db.newPWProfileUpdate(first, last, email, hashedPw, userId)
                     .then(() => {
                         if (!url.startsWith("http" || "https") && url != "") {
                             url = "http://" + url;
                         }
-                        console.log(url);
-
                         db.updateUserProfiles(age, city, url, userId)
                             .then(() => {
                                 res.redirect("/profile/edit");
                             })
-                            .catch(error => {
-                                console.log(
-                                    "error in newPW user ProfileUpdate: ",
-                                    error
-                                );
+                            .catch((error) => {
                                 res.render("edit_profile", { error });
                             });
                     })
-                    .catch(error => {
-                        console.log("newpw profile update: ", error);
+                    .catch((error) => {
                         res.render("edit_profile", { error });
                     });
             })
-            .catch(err => {
-                console.log("error in Post register in hash", err);
+            .catch((err) => {
                 res.render("edit_profile", { error: true });
             });
     }

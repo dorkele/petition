@@ -12,7 +12,7 @@ html {
 body {
     height: 100%;
     background-image: url("open_book_lower.png");
-    background-size: 100%;
+    background-size: cover;
     background-repeat: no-repeat;
 }
 
@@ -25,8 +25,9 @@ body {
     grid-template-rows: 10% 65% 20% 10%;
 }
 
-.canvas {
+#canv {
     align-self: center;
+    cursor: crosshair;
 }
 
 .left {
