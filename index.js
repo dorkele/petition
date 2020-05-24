@@ -306,7 +306,7 @@ app.post("/profile/edit", (req, res) => {
                         res.render("edit_profile", { error });
                     });
             })
-            .catch((err) => {
+            .catch(() => {
                 res.render("edit_profile", { error: true });
             });
     }
