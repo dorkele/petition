@@ -27,7 +27,9 @@ They can see the list of signers.
 -   Node / Express
 -   PostgreSQL
 
-## [Explore on your own](https://foundintranslationpetition.herokuapp.com/login)
+## Explore on your own
+
+[Petition on Heroku](https://foundintranslationpetition.herokuapp.com/login)
 
 ## Future Features
 
